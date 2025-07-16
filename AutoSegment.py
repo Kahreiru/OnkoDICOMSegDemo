@@ -63,16 +63,6 @@ class OnkoSegmentationGUI(QWidget):
                 output_file=output_rt
             )
 
-
-            # for mask_file in glob.glob(os.path.join(output_dir, "*.nii.gz")):
-            #     struct_name = os.path.basename(mask_file).replace(".nii.gz", "")
-            #     output_rt = os.path.join(output_dir, f"{struct_name}.dcm")
-            #     nifti_to_rtstruct.convert_nifti(
-            #         dcm_path=dicom_dir,
-            #         mask_input=mask_file,
-            #         output_file=output_rt
-            #     )
-
             QMessageBox.information(self, "Success",
                                     f"Segmentation complete for '{selected_task}'\nOutput: {output_dir}")
         except Exception as e:
