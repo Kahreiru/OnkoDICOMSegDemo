@@ -49,14 +49,15 @@ class OnkoSegmentationGUI(QWidget):
                 input=dicom_dir,
                 output=output_dir,
                 task=selected_task,
-                device="cpu",
-                fast=True
+                output_type="dicom", # output to dicom
+                device="cpu", # Run on cpu
+                fastest=True # 6mm resolution
             )
 
             mask_file = glob.glob(os.path.join(output_dir, selected_task, "*mask.nii.gz"))
             output_rt = os.path.join(dicom_dir, "rtss.dcm")
 
-            # Convert the Nifiti output to DICOM rtss file
+            # Convert the Nifti output to DICOM rtss file
             nifti_to_rtstruct.convert_nifti(
                 dcm_path=dicom_dir,
                 mask_input=mask_file,
