@@ -20,8 +20,12 @@ class OnkoSegmentationGUI(QWidget):
         self.layout.addWidget(QLabel("Select Segmentation Type:"))
         self.task_selector = QComboBox()
         self.task_selector.addItems([
-            "total", "organs", "bones", "muscles", "vasculature",
-            "lung_vessels", "pleural", "heartchambers", "cerebral_bleed"
+            "total", "total_mr", "lung_vessels", "body", "body_mr",
+            "vertebrae_mr", "hip_implant", "pleural_pericard_effusion", "cerebral_bleed",
+            "head_glands_cavities", "head_muscles", "headneck_bones_vessels",
+            "headneck_muscles", "liver_vessels", "oculomotor_muscles",
+            "lung_nodules", "kidney_cysts", "breasts", "liver_segments",
+            "liver_segments_mr", "craniofacial_structures",  "abdominal_muscles"
         ])
         self.task_selector.setCurrentText("total")
         self.layout.addWidget(self.task_selector)
@@ -49,12 +53,13 @@ class OnkoSegmentationGUI(QWidget):
                 input=dicom_dir,
                 output=output_dir,
                 task=selected_task,
-                output_type="dicom", # output to dicom
+                output_type="nifti", # output to dicom
                 device="cpu", # Run on cpu
-                fastest=True # 6mm resolution
+                fastest=True, # 6mm resolution
+                quiet=True,
             )
 
-            mask_file = glob.glob(os.path.join(output_dir, selected_task, "*mask.nii.gz"))
+            mask_file = glob.glob(os.path.join(output_dir, selected_task, ".nii.gz"))
             output_rt = os.path.join(dicom_dir, "rtss.dcm")
 
             # Convert the Nifti output to DICOM rtss file
