@@ -14,10 +14,11 @@ in-project = true
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-pyside6 = ">=6.4.0, <6.9"
+pyside6 = "^6.9.1"
 acvl-utils = ">=0.2.5,<0.3.0"
 pydicom = "3.0"
 platipy = "*"
+totalsegmentator = "^2.10.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
