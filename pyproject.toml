@@ -1,18 +1,24 @@
-[project]
+[tool.poetry]
 name = "onkodicomsegdemo"
 version = "0.1.0"
 description = "Basic demo of TotalSegmentator API"
 authors = [
-    {name = "Tim Glasgow"}
+    "Tim Glasgow",
+    "Matt Carlile"
 ]
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "acvl-utils (>=0.2.5,<0.3.0)",
-    "pydicom (==3.0)",
-    "platipy (>=0.7.2,<0.8.0)"
-]
 
+[poetry.virtualenvs]
+create = true
+in-project = true
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+pyside6 = "^6.9.1"
+acvl-utils = ">=0.2.5,<0.3.0"
+pydicom = "3.0"
+platipy = "*"
+totalsegmentator = "^2.10.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
