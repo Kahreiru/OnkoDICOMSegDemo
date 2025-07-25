@@ -1,12 +1,14 @@
 import os
-import glob
+import logging
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog,
     QLabel, QComboBox, QMessageBox
 )
 from totalsegmentator.python_api import totalsegmentator
-from platipy.dicom.io import nifti_to_rtstruct
+from nifti_converter import nifti_to_rtstruct_conversion
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class OnkoSegmentationGUI(QWidget):
     def __init__(self):
@@ -55,19 +57,13 @@ class OnkoSegmentationGUI(QWidget):
                 task=selected_task,
                 output_type="nifti", # output to dicom
                 device="cpu", # Run on cpu
-                fastest=True, # 6mm resolution
-                quiet=True,
+                fast=True
             )
 
-            mask_file = glob.glob(os.path.join(output_dir, selected_task, ".nii.gz"))
             output_rt = os.path.join(dicom_dir, "rtss.dcm")
 
             # Convert the Nifti output to DICOM rtss file
-            nifti_to_rtstruct.convert_nifti(
-                dcm_path=dicom_dir,
-                mask_input=mask_file,
-                output_file=output_rt
-            )
+            nifti_to_rtstruct_conversion(output_dir, dicom_dir,output_rt)
 
             QMessageBox.information(self, "Success",
                                     f"Segmentation complete for '{selected_task}'\nOutput: {output_dir}")
