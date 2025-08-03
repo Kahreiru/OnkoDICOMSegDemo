@@ -40,6 +40,7 @@ class AutoSegmentation:
         try:
             shutil.copytree(self.dicom_dir, self.temp_dir, ignore=ignore_func, dirs_exist_ok=True)
         except Exception as e:
+            logger.exception("Failed to copy DICOM files.")
             self.controller.update_progress_text("Failed to copy DICOM files.")
 
     def _connect_terminal_stream_to_gui(self):
