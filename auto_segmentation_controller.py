@@ -1,4 +1,11 @@
+import os
+
+from PySide6.QtCore import QThreadPool, Slot
+
 from auto_segmentation import AutoSegmentation
+# from multithread import Worker
+import threading
+from dicom_viewer_tab import DicomViewer
 
 class AutoSegmentationController:
     """
@@ -15,6 +22,9 @@ class AutoSegmentationController:
         """
         self._view = view
         self._model = None
+        self.threadpool = QThreadPool()
+        self.dicom_dir = None
+        self.nifti_dir = None
 
     def set_view(self, view) -> None:
         """
@@ -26,12 +36,12 @@ class AutoSegmentationController:
         self._view = view
 
     # View related methods
-    def start_button_clicked(self) -> None:
+    def start_button_clicked(self, dicom_dir) -> None:
         """
         To be called when the button to start the selected segmentation task is clicked
         :rtype: None
         """
-        self.run_task(self._view.get_segmentation_task(), self._view.get_fast_value())
+        self.run_task(dicom_dir, self._view.get_segmentation_task(), self._view.get_fast_value())
 
     def update_progress_bar_value(self, value: int) -> None:
         """
@@ -42,6 +52,7 @@ class AutoSegmentationController:
         """
         self._view.set_progress_bar_value(value)
 
+    @Slot()
     def update_progress_text(self, text: str) -> None:
         """
         Access the view of the feature and updates the progress text on the UI element
@@ -59,11 +70,25 @@ class AutoSegmentationController:
         :param fast: bool
         :rtype: None
         """
-        # Run tasks on separate thread
+        self.dicom_dir = dicom_dir
+        self.nifit_dir = os.path.join(dicom_dir, "segmentations")
 
         # Instantiate AutoSegmentation passing the required settings from the UI
-        auto_segmentation = AutoSegmentation(dicom_dir, task, fast, controller=self)
-        auto_segmentation.run_segmentation_workflow()
+        auto_segmentation = AutoSegmentation(self)
 
-        # to run the task in the model class
-        print(f'Running task: {task} with Fast set to {fast}')
+        # Run the API task on separate thread
+        # worker = Worker(auto_segmentation.run_segmentation_workflow,dicom_dir, task, fast)
+        # self.threadpool.start(worker)
+
+        seg_thread = threading.Thread(target=auto_segmentation.run_segmentation_workflow, args=(dicom_dir, task, fast))
+        seg_thread.start()
+
+    @Slot()
+    def on_segmentation_finished(self) -> None:
+        self.dicom_viewer = DicomViewer(dicom_dir=self.dicom_dir)
+        self.dicom_viewer.show()
+
+    @Slot()
+    def on_segmentation_error(self, error) -> None:
+        print("Segmentation Error from controller.")
+

@@ -1,12 +1,14 @@
 from PySide6.QtCore import (
     QRunnable,
     Slot,
-    Signal,
     QObject,
+    Signal
 )
 
-class WorkerSignals(QObject):
+class SegmentationWorkerSignals(QObject):
+    progress_updated = Signal(str)
     finished = Signal()
+    error = Signal(str)
 
 class Worker(QRunnable):
     """Worker thread.
@@ -25,14 +27,8 @@ class Worker(QRunnable):
         self.args = args
         self.kwargs = kwargs
 
-        # Create object containing signals
-        self.signals = WorkerSignals()
-
 
     @Slot()
     def run(self):
         """Initialise the runner function with passed args, kwargs."""
-        print('Processing...Please Wait')
         self.fn(*self.args, **self.kwargs)
-        self.signals.finished.emit()
-        print('Process Complete')

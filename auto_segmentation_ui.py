@@ -1,5 +1,8 @@
 import logging
 import sys
+
+from PySide6.QtGui import QTextCursor
+
 from redirect_stdout import ConsoleOutputStream
 from auto_segmentation_controller import AutoSegmentationController
 
@@ -26,7 +29,7 @@ class OnkoSegmentationGUI(QWidget):
         """
 
         super().__init__()
-        self.setWindowTitle("OnkoDICOM + TotalSegmentator")
+        self.setWindowTitle("OnkoDICOM + Auto Segmentation")
         self.setGeometry(100, 100, 400, 200)
         self.controller = AutoSegmentationController(self)
 
@@ -43,6 +46,7 @@ class OnkoSegmentationGUI(QWidget):
             "lung_nodules", "kidney_cysts", "breasts", "liver_segments",
             "liver_segments_mr", "craniofacial_structures",  "abdominal_muscles"
         ])
+
         self.task_selector.setCurrentText("total")
         self.layout.addWidget(self.task_selector)
 
@@ -64,14 +68,16 @@ class OnkoSegmentationGUI(QWidget):
         self.controller.run_task(dicom_dir, self.task_selector.currentText(), fast=True)
 
     def set_progress_text(self, text: str) -> None:
-        """
-        Public Method to set the progress text in the progress text box.
-        To display the text to the user of what is currently being performed,
-        to inform the user as to the current aspect of the task being performed.
-        :param text: str
-        :rtype: None
+        """Updates the progress text area.
+
+        Appends the given text to the text edit and scrolls to the bottom
+        to ensure the latest updates are visible.
         """
         self.text_edit.append(text)
+        cursor = self.text_edit.textCursor() # Get cursor from text_edit
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        self.text_edit.setTextCursor(cursor) # Set cursor for text_edit
+        self.text_edit.ensureCursorVisible() # Ensure cursor is visible for text_edit
 
 if __name__ == "__main__":
     app = QApplication([])
