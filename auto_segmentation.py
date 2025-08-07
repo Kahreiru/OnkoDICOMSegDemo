@@ -2,13 +2,11 @@ import os
 import logging
 import shutil
 import tempfile
+
+from multithread import SegmentationWorkerSignals
+
 from redirect_stdout import ConsoleOutputStream, redirect_output_to_gui, setup_logging
-
-from PySide6.QtWidgets import QMessageBox
-from PySide6.QtCore import QThreadPool
-from multithread import Worker
 from ignore_files_in_dir import ignore_func
-
 from totalsegmentator.python_api import totalsegmentator
 from nifti_converter import nifti_to_rtstruct_conversion
 
@@ -24,23 +22,26 @@ class AutoSegmentation:
     output to DICOM RTSTRUCT format.
     """
 
-    def __init__(self, dicom_dir: str, task: str, fast: bool, controller):
-        self.task = task
-        self.fast = fast
+    def __init__(self, controller):
         self.controller = controller
-        self.dicom_dir = dicom_dir
         self.temp_dir = tempfile.mkdtemp()
-        self.threadpool = QThreadPool()
+        self.signals = SegmentationWorkerSignals()
 
-    def _create_copied_temporary_directory(self):
-        if not self.dicom_dir:
-            self.controller.update_progress_text("No DICOM directory found.")
+        # Connect worker signals to controller slots
+        self.signals.progress_updated.connect(self.controller.update_progress_text)
+        self.signals.finished.connect(self.controller.on_segmentation_finished)
+        self.signals.error.connect(self.controller.on_segmentation_error)
+
+    def _create_copied_temporary_directory(self, dicom_dir):
+        if not dicom_dir:
+            self.signals.error.emit('No dicom directory found')
             return
 
         try:
-            shutil.copytree(self.dicom_dir, self.temp_dir, ignore=ignore_func, dirs_exist_ok=True)
+            shutil.copytree(dicom_dir, self.temp_dir, ignore=ignore_func, dirs_exist_ok=True)
         except Exception as e:
-            self.controller.update_progress_text("Failed to copy DICOM files.")
+            logger.exception("Failed to copy DICOM files.")
+            self.signals.error.emit("Failed to copy DICOM files.")
 
     def _connect_terminal_stream_to_gui(self):
         output_stream = ConsoleOutputStream()
@@ -48,7 +49,7 @@ class AutoSegmentation:
         redirect_output_to_gui(output_stream)
         setup_logging(output_stream)
 
-    def run_segmentation_workflow(self):
+    def run_segmentation_workflow(self, dicom_dir, task, fast):
         """
         Executes the segmentation workflow.
 
@@ -56,54 +57,46 @@ class AutoSegmentation:
         directory to running the segmentation task and converting the output to DICOM RTSTRUCT.
         """
         # Clear previous progress text
-        self.controller.update_progress_text("Starting segmentation workflow...")
+        self.signals.progress_updated.emit("Starting segmentation workflow...")
 
         # Copy contents from selected dir to temp dir (excludes rt*.dcm files)
-        self._create_copied_temporary_directory()
+        self._create_copied_temporary_directory(dicom_dir)
 
         # Connect the terminal stream output to the progress text gui element
         self._connect_terminal_stream_to_gui()
 
         # Create the output path for Nifti segmentation files
-        output_dir = os.path.join(self.dicom_dir, "segmentations")
+        output_dir = os.path.join(dicom_dir, "segmentations")
         os.makedirs(output_dir, exist_ok=True)
-        output_rt = os.path.join(self.dicom_dir, "rtss.dcm")
+        output_rt = os.path.join(dicom_dir, "rtss.dcm")
 
         # Call total segmentator API
         try:
-            # Pass the function to execute to worker
-            worker = Worker(
-                totalsegmentator,
+            totalsegmentator(
                 input=self.temp_dir,
                 output=output_dir,
-                task=self.task,
+                task=task,
                 output_type="nifti",  # output to dicom
                 device="cpu",  # Run on cpu
-                fastest=True
+                fastest=fast
             )
 
-            # Execute the function on worker thread
-            self.threadpool.start(worker)
-
-            # Setup and check finished signal from thread
-            worker.signals.finished.connect(lambda: self._on_segmentation_finished(output_dir, output_rt))
-
-            output_rt = os.path.join(self.dicom_dir, "rtss.dcm")
+            output_rt = os.path.join(dicom_dir, "rtss.dcm")
 
         except Exception as e:
-            QMessageBox.critical(None, "Segmentation Failed", str(e))
+            self.signals.error.emit("Failed to run segmentation workflow.")
+            logger.exception(e)
             shutil.rmtree(output_dir)
 
-    def _on_segmentation_finished(self, output_dir, output_rt):
-        # Convert the Nifti output to DICOM rtss file
-        worker = Worker(nifti_to_rtstruct_conversion, output_dir, self.temp_dir, output_rt)
+        try:
+            # Convert the Nifti output to DICOM rtss file
+            nifti_to_rtstruct_conversion(output_dir, self.temp_dir, output_rt)
 
-        # Execute the function on worker thread
-        self.threadpool.start(worker)
+            self.signals.progress_updated.emit("Conversion successful.")
+            self.signals.finished.emit()
+            shutil.rmtree(self.temp_dir)
 
-        # Setup and check finished signal from thread
-        worker.signals.finished.connect(lambda: self._on_conversion_finished())
-
-    def _on_conversion_finished(self):
-        QMessageBox.information(None, "Success", "Segmentation complete!")
-        shutil.rmtree(self.temp_dir)
+        except Exception as e:
+            self.signals.error.emit("Failed to convert files to RTSTRUCT format.")
+            logger.exception(e)
+            shutil.rmtree(output_dir)
