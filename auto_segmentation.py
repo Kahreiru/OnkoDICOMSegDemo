@@ -1,78 +1,109 @@
 import os
 import logging
-from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog,
-    QLabel, QComboBox, QMessageBox
-)
+import shutil
+import tempfile
+from redirect_stdout import ConsoleOutputStream, redirect_output_to_gui, setup_logging
+
+from PySide6.QtWidgets import QMessageBox
+from PySide6.QtCore import QThreadPool
+from multithread import Worker
+from ignore_files_in_dir import ignore_func
+
 from totalsegmentator.python_api import totalsegmentator
 from nifti_converter import nifti_to_rtstruct_conversion
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class OnkoSegmentationGUI(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("OnkoDICOM + TotalSegmentator")
-        self.setGeometry(100, 100, 400, 200)
 
-        self.layout = QVBoxLayout()
+class AutoSegmentation:
+    """Handles the automatic segmentation process.
 
-        # Task dropdown
-        self.layout.addWidget(QLabel("Select Segmentation Type:"))
-        self.task_selector = QComboBox()
-        self.task_selector.addItems([
-            "total", "total_mr", "lung_vessels", "body", "body_mr",
-            "vertebrae_mr", "hip_implant", "pleural_pericard_effusion", "cerebral_bleed",
-            "head_glands_cavities", "head_muscles", "headneck_bones_vessels",
-            "headneck_muscles", "liver_vessels", "oculomotor_muscles",
-            "lung_nodules", "kidney_cysts", "breasts", "liver_segments",
-            "liver_segments_mr", "craniofacial_structures",  "abdominal_muscles"
-        ])
-        self.task_selector.setCurrentText("total")
-        self.layout.addWidget(self.task_selector)
+    This class manages the workflow for running TotalSegmentator, including
+    copying DICOM files, setting up the segmentation task, and converting the
+    output to DICOM RTSTRUCT format.
+    """
 
-        # Run button
-        self.run_button = QPushButton("Run Segmentation")
-        self.run_button.clicked.connect(self.run_segmentation_workflow)
-        self.layout.addWidget(self.run_button)
+    def __init__(self, dicom_dir: str, task: str, fast: bool, controller):
+        self.task = task
+        self.fast = fast
+        self.controller = controller
+        self.dicom_dir = dicom_dir
+        self.temp_dir = tempfile.mkdtemp()
+        self.threadpool = QThreadPool()
 
-        self.setLayout(self.layout)
-
-    def run_segmentation_workflow(self):
-        dicom_dir = QFileDialog.getExistingDirectory(self, "Select DICOM CT Series")
-        if not dicom_dir:
+    def _create_copied_temporary_directory(self):
+        if not self.dicom_dir:
+            self.controller.update_progress_text("No DICOM directory found.")
             return
 
-        # Saves the nifti segmentations into segmentations folder in same dir
-        output_dir = os.path.join(dicom_dir, "segmentations")
-        os.makedirs(output_dir, exist_ok=True)
-
-        selected_task = self.task_selector.currentText()
-
         try:
-            totalsegmentator(
-                input=dicom_dir,
+            shutil.copytree(self.dicom_dir, self.temp_dir, ignore=ignore_func, dirs_exist_ok=True)
+        except Exception as e:
+            self.controller.update_progress_text("Failed to copy DICOM files.")
+
+    def _connect_terminal_stream_to_gui(self):
+        output_stream = ConsoleOutputStream()
+        output_stream.new_text.connect(self.controller.update_progress_text)
+        redirect_output_to_gui(output_stream)
+        setup_logging(output_stream)
+
+    def run_segmentation_workflow(self):
+        """
+        Executes the segmentation workflow.
+
+        This method handles the entire segmentation process, from selecting the DICOM
+        directory to running the segmentation task and converting the output to DICOM RTSTRUCT.
+        """
+        # Clear previous progress text
+        self.controller.update_progress_text("Starting segmentation workflow...")
+
+        # Copy contents from selected dir to temp dir (excludes rt*.dcm files)
+        self._create_copied_temporary_directory()
+
+        # Connect the terminal stream output to the progress text gui element
+        self._connect_terminal_stream_to_gui()
+
+        # Create the output path for Nifti segmentation files
+        output_dir = os.path.join(self.dicom_dir, "segmentations")
+        os.makedirs(output_dir, exist_ok=True)
+        output_rt = os.path.join(self.dicom_dir, "rtss.dcm")
+
+        # Call total segmentator API
+        try:
+            # Pass the function to execute to worker
+            worker = Worker(
+                totalsegmentator,
+                input=self.temp_dir,
                 output=output_dir,
-                task=selected_task,
-                output_type="nifti", # output to dicom
-                device="cpu", # Run on cpu
-                fast=True
+                task=self.task,
+                output_type="nifti",  # output to dicom
+                device="cpu",  # Run on cpu
+                fastest=True
             )
 
-            output_rt = os.path.join(dicom_dir, "rtss.dcm")
+            # Execute the function on worker thread
+            self.threadpool.start(worker)
 
-            # Convert the Nifti output to DICOM rtss file
-            nifti_to_rtstruct_conversion(output_dir, dicom_dir,output_rt)
+            # Setup and check finished signal from thread
+            worker.signals.finished.connect(lambda: self._on_segmentation_finished(output_dir, output_rt))
 
-            QMessageBox.information(self, "Success",
-                                    f"Segmentation complete for '{selected_task}'\nOutput: {output_dir}")
+            output_rt = os.path.join(self.dicom_dir, "rtss.dcm")
+
         except Exception as e:
-            QMessageBox.critical(self, "Segmentation Failed", str(e))
+            QMessageBox.critical(None, "Segmentation Failed", str(e))
+            shutil.rmtree(output_dir)
 
+    def _on_segmentation_finished(self, output_dir, output_rt):
+        # Convert the Nifti output to DICOM rtss file
+        worker = Worker(nifti_to_rtstruct_conversion, output_dir, self.temp_dir, output_rt)
 
-if __name__ == "__main__":
-    app = QApplication([])
-    window = OnkoSegmentationGUI()
-    window.show()
-    app.exec()
+        # Execute the function on worker thread
+        self.threadpool.start(worker)
+
+        # Setup and check finished signal from thread
+        worker.signals.finished.connect(lambda: self._on_conversion_finished())
+
+    def _on_conversion_finished(self):
+        QMessageBox.information(None, "Success", "Segmentation complete!")
+        shutil.rmtree(self.temp_dir)

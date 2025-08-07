@@ -75,6 +75,7 @@ def nifti_to_rtstruct_conversion(nifti_path: str, dicom_path: str, output_path: 
     """
 
     logging.info("Converting NIfTI to RTStruct...")
+    print("Converting NIfTI to RTStruct...")
 
     try:
         # Validate inputs
@@ -149,14 +150,4 @@ def nifti_to_rtstruct_conversion(nifti_path: str, dicom_path: str, output_path: 
     except Exception as e:
         logging.error(f"An unexpected error occurred: {type(e).__name__}: {e}")
         raise
-
-# TESTING - uses local absolute paths (change to your local paths)
-# if __name__ == "__main__":
-#
-#     # Hard coded variable for testing
-#     dicom_path_in = "/Users/timglasgow/Downloads/3229478DC190B24900C6F3A1C514AF18/3229478DC190B24900C6F3A1C514AF18.CT.FU"
-#     nifti_path_in = "/Users/timglasgow/Downloads/3229478DC190B24900C6F3A1C514AF18/3229478DC190B24900C6F3A1C514AF18.CT.FU/segmentations/"
-#     output_path_in = "/Users/timglasgow/Downloads/3229478DC190B24900C6F3A1C514AF18/3229478DC190B24900C6F3A1C514AF18.CT.FU/rtss.dcm"
-#
-#     nifti_to_rtstruct_conversion(nifti_path_in, dicom_path_in, output_path_in)
 

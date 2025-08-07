@@ -14,10 +14,18 @@ from PySide6.QtWidgets import (
 import nifti_converter
 
 class NiftiConverter(QWidget):
+    """Widget for converting NIfTI segmentations to DICOM RTStruct.
+
+    Provides a UI for selecting NIfTI and DICOM directories and
+    initiating the conversion process.
     """
-    WORK IN PROGRESS - Basic UI for Nifti Converter
-    """
+
     def __init__(self):
+        """Initialize the NiftiConverter widget.
+
+        Sets up the UI elements, including labels, buttons, and layouts,
+        and connects the buttons to their respective functions.
+        """
         super().__init__()
 
         self.nifti_path = None
