@@ -71,7 +71,7 @@ class AutoSegmentationController:
         :rtype: None
         """
         self.dicom_dir = dicom_dir
-        self.nifit_dir = os.path.join(dicom_dir, "segmentations")
+        self.nifti_dir = os.path.join(dicom_dir, "segmentations")
 
         # Instantiate AutoSegmentation passing the required settings from the UI
         auto_segmentation = AutoSegmentation(self)
