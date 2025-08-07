@@ -19,7 +19,6 @@ from PySide6.QtCore import Qt, QSize, QPointF
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-
 import random
 
 # Helper function to generate contour colors
@@ -57,9 +56,6 @@ class DicomViewer(QWidget):
         self.canvas_sagittal.setMinimumSize(QSize(256, 256))
         self.sagittal_slider = QSlider()
         self.sagittal_slider.setStyleSheet(self.style_sheet())
-
-        # Blank viewer
-        # self.canvas_blank = FigureCanvas(plt.Figure())
 
         # Connect slider signals
         self.axial_slider.valueChanged.connect(self.update_display)
@@ -138,7 +134,6 @@ class DicomViewer(QWidget):
 
         # Load dicom image set
         self.load_dicom()
-
 
     def load_dicom(self):
         """
