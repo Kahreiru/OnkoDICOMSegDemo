@@ -143,7 +143,7 @@ class AutoSegmentationTab(QtWidgets.QWidget):
         Protected method to be called when the start button is clicked.
         :rtype: None
         """
-        self._controller.start_button_clicked(self._dicom_dir)
+        self._controller.start_button_clicked(self.dicom_dir)
 
     def get_segmentation_task(self) -> str:
         """

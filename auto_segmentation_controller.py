@@ -85,8 +85,8 @@ class AutoSegmentationController:
 
     @Slot()
     def on_segmentation_finished(self) -> None:
-        self.dicom_viewer = DicomViewer(dicom_dir=self.dicom_dir)
-        self.dicom_viewer.show()
+        self.update_progress_bar_value(100)
+        self.update_progress_text("Segmentation Finished")
 
     @Slot()
     def on_segmentation_error(self, error) -> None:
