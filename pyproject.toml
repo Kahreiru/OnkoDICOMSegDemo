@@ -2,6 +2,7 @@
 name = "onkodicomsegdemo"
 version = "0.1.0"
 description = "Basic demo of TotalSegmentator API"
+packages-mode = false
 authors = [
     "Tim Glasgow",
     "Matt Carlile"
