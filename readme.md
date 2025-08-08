@@ -4,7 +4,7 @@
 This is a prototype of the functionality which has been proposed to be added
 to the program [OnkoDicom](https://onkodicom.com.au/) an open source medical 
 research software which has been used in a wide variety of areas including 
-areas africa intended to improve the ability for radio-oncologists to develop 
+areas in Africa, intended to improve the ability for radio-oncologists to develop 
 methodologies to help patients.
 
 This specific functionality which is being prototyped is the ability for the user
