@@ -24,7 +24,7 @@ and isolate the specific body part.
 - acvl-utils: [link](https://github.com/MIC-DKFZ/acvl_utils)
 
 ## Installation
-1. Extract folder from zip
+1. Extract the folder from the zip
 2. Open Terminal in folder location
 3. Input `poetry install` in to console
 4. Wait for the installation to complete
