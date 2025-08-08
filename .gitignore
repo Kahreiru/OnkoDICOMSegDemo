@@ -1,0 +1,25 @@
+# Ignore venv
+venv/
+.venv/
+
+# Ignore .idea
+.idea/
+
+# Ignore testdata
+test/testdata
+test/batchtestdata
+
+# Ignore .pyc
+*.pyc
+*.pkl
+data/csv/patientHash.csv
+Hash_map.csv
+*.pyo
+
+# Ignore compile results
+build/
+dist/
+.qodo
+
+# Ignore Apple specific files
+.DS_Store
