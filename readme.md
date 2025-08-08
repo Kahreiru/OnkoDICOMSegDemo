@@ -26,7 +26,7 @@ and isolate the specific body part.
 ## Installation
 1. Extract the folder from the zip
 2. Open Terminal in folder location
-3. Input `poetry install` in to console
+3. Input `poetry install` into console
 4. Wait for the installation to complete
 
 ## Usage
