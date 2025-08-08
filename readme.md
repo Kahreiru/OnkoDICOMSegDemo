@@ -32,7 +32,7 @@ and isolate the specific body part.
 ## Usage
 Included in the Zip file is an anonymised dicom file for the purposes of demonstration
 1. Open Terminal in the folder location
-2. In the console, Input `poetry run main.md`
+2. Enter `poetry run main.md` into the console.
 3. wait for the program to open
 4. When the file selection prompt opens select the `Demo` file
 5. You will then be directed to the prototype user interface
