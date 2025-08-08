@@ -32,7 +32,7 @@ and isolate the specific body part.
 ## Usage
 Included in the Zip file is an anonymised dicom file for the purposes of demonstration
 1. Open Terminal in the folder location
-2. Enter `poetry run main.md` into the console.
+2. Enter `poetry run main.py` into the console.
 3. wait for the program to open
 4. When the file selection prompt opens select the `Demo` file
 5. You will then be directed to the prototype user interface
@@ -42,7 +42,7 @@ Included in the Zip file is an anonymised dicom file for the purposes of demonst
 8. Click Start
 9. Wait for processing to complete as this may take several minutes
 10. Once complete, click 'Load Segmentations'
-11. Open the Segmentation Folder
+11. Open the segmentations folder saved in the same directory as the loaded dicom image set
 12. Select Desired Segmentations to display (for this demo, lung segmentations will show)
 13. View segmentations on each axis by dragging the sliders up and down on the image views
 14. To disable the segmentations on the views
