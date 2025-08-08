@@ -16,6 +16,10 @@ from dicom_viewer_tab import DicomViewer
 class UIMainWindow(QMainWindow):
 
     def __init__(self):
+        """Initialize the main window.
+
+        Sets up the main window, including stylesheet, minimum size, title, and central widget.
+        """
         super().__init__()
 
         self.stylesheet: StyleSheetReader = StyleSheetReader()
@@ -27,6 +31,11 @@ class UIMainWindow(QMainWindow):
         self.setup_central_widget()
 
     def setup_central_widget(self):
+        """Set up the central widget.
+
+        Creates and configures the central widget, which includes a splitter for the left
+        and right panels, and adds the footer.
+        """
 
         # Create central widget for multipanel view
         central_widget = QWidget()
@@ -64,10 +73,13 @@ class UIMainWindow(QMainWindow):
 
         self.central_widget_layout.addWidget(self.footer)
 
-        # Create a Dicom View containing single-slice and 3-slice views
-
-
+    # Borrowed from OnkoDicom
     def create_footer(self):
+        """Create the footer widget.
+
+        Creates and configures the footer widget, adding a label with version information
+        aligned to the right.
+        """
         self.footer.setFixedHeight(15)
         layout_footer = QtWidgets.QHBoxLayout(self.footer)
         layout_footer.setContentsMargins(0, 0, 0, 0)
@@ -76,7 +88,6 @@ class UIMainWindow(QMainWindow):
         label_footer.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight)
 
         layout_footer.addWidget(label_footer)
-
 
 
 if __name__ == "__main__":

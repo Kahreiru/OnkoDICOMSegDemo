@@ -27,6 +27,10 @@ def generate_random_rgba(alpha=120):
 
 class DicomViewer(QWidget):
     def __init__(self, dicom_dir: str) -> None:
+        """Initialize the DICOM viewer.
+
+        Sets up the UI, loads the DICOM image set, and prepares for segmentation overlays.
+        """
         super().__init__()
         self.setWindowTitle("DICOM Segmentation Viewer")
         self.dicom_dir = dicom_dir
@@ -184,7 +188,7 @@ class DicomViewer(QWidget):
             self.checkbox_container.itemAt(i).widget().deleteLater()
 
         # Iterate over the segmentation files load, add check box, and display
-        for i, file_path in enumerate(files):
+        for file_path in files:
             seg_image = sitk.ReadImage(file_path)
             seg_image = sitk.DICOMOrient(seg_image, 'LPS')
             seg_array = sitk.GetArrayFromImage(seg_image).astype(bool)
@@ -225,7 +229,7 @@ class DicomViewer(QWidget):
 
         # base_colors = plt.colormaps['tab20']
 
-        for i, (name, mask) in enumerate(mask_dict.items()):
+        for name, mask in mask_dict.items():
             self.seg_arrays.append(mask.astype(bool))
             self.seg_names.append(name)
             # self.seg_colors.append(base_colors(i))
@@ -239,7 +243,14 @@ class DicomViewer(QWidget):
 
         self.update_display()
 
+    #TODO: Refactor the following function into smaller helper functions
     def update_display(self):
+        """Update the display with the current slice and segmentation overlays.
+
+        Updates the axial, coronal, and sagittal views with the current slice
+        selected by the sliders. It overlays segmentations based on their visibility
+        settings.
+        """
 
         if self.ct_array is None:
             logger.warning("No image data present!")
@@ -416,14 +427,3 @@ class DicomViewer(QWidget):
             self.canvas_sagittal.width(), self.canvas_sagittal.height(),
             aspectMode=Qt.AspectRatioMode.IgnoreAspectRatio, mode=Qt.SmoothTransformation
         ))
-
-
-# if __name__ == "__main__":
-#     import sys
-#     from PySide6.QtCore import Qt
-#
-#     app = QApplication(sys.argv)
-#     viewer = DicomViewer('/Users/timglasgow/Downloads/3229478DC190B24900C6F3A1C514AF18/3229478DC190B24900C6F3A1C514AF18.CT.FU')
-#     viewer.resize(1000, 800)
-#     viewer.show()
-#     sys.exit(app.exec())

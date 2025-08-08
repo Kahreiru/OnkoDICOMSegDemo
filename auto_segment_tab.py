@@ -36,6 +36,7 @@ class AutoSegmentationTab(QtWidgets.QWidget):
         self._make_start_button(self._start_button_clicked)  # Adding Start Button Button
         self.dicom_dir = dicom_dir
         self.setLayout(self._auto_segmentation_layout)  # Setting the layout to the Main Window
+        self._start_button_enabled = True
 
         # Create Controller Class if one does not already exist
         # or Change view to new instance of view
@@ -183,6 +184,18 @@ class AutoSegmentationTab(QtWidgets.QWidget):
         cursor.movePosition(QTextCursor.MoveOperation.End)
         self._progress_text.setTextCursor(cursor)
         self._progress_text.ensureCursorVisible()
+
+    def set_start_button_status(self):
+
+        self._start_button_enabled = not self._start_button_enabled
+
+        if self._start_button_enabled:
+            self._start_button.setEnabled(self._start_button_enabled)
+            self._start_button.setText("Start")
+        else:
+            #TODO: Set this to stop to end thread?
+            self._start_button.setEnabled(self._start_button_enabled)
+            self._start_button.setText("Wait")
 
 
     def _check_task_is_fast_compatible(self):

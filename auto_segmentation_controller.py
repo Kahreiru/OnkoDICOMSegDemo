@@ -41,6 +41,10 @@ class AutoSegmentationController:
         To be called when the button to start the selected segmentation task is clicked
         :rtype: None
         """
+        # Disable start button while segmentation processes
+        self._view.set_start_button_status()
+
+        # Run Auto Segmentation task
         self.run_task(dicom_dir, self._view.get_segmentation_task(), self._view.get_fast_value())
 
     def update_progress_bar_value(self, value: int) -> None:
@@ -85,10 +89,17 @@ class AutoSegmentationController:
 
     @Slot()
     def on_segmentation_finished(self) -> None:
+        # Update the text edit UI
         self.update_progress_bar_value(100)
         self.update_progress_text("Segmentation Finished")
+
+        # Disable start button while segmentation processes
+        self._view.set_start_button_status()
+
 
     @Slot()
     def on_segmentation_error(self, error) -> None:
         print("Segmentation Error from controller.")
 
+        # Disable start button while segmentation processes
+        self._view.set_start_button_status()
