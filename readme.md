@@ -22,6 +22,8 @@ and isolate the specific body part.
 - pydicom: [link](https://pydicom.github.io/)
 - platipy: [link](https://github.com/pyplati/platipy)
 - acvl-utils: [link](https://github.com/MIC-DKFZ/acvl_utils)
+- rt_utils: [link](https://github.com/qurit/rt-utils)   
+- SimpleITK: [link](https://simpleitk.readthedocs.io/en/master/gettingStarted.html)
 
 ## Installation
 1. Extract the folder from the zip
