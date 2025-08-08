@@ -19,7 +19,7 @@ class UIMainWindow(QMainWindow):
         super().__init__()
 
         self.stylesheet: StyleSheetReader = StyleSheetReader()
-        self.setMinimumSize(1080, 900)
+        self.setMinimumSize(1080, 800)
         self.setWindowTitle("AutoSegmentation Demo")
         self.setStyleSheet(self.stylesheet())
         self.dicom_dir: str = QFileDialog.getExistingDirectory(self, "Select DICOM CT Series")
@@ -45,7 +45,7 @@ class UIMainWindow(QMainWindow):
         self.right_panel = QtWidgets.QTabWidget()
         self.right_panel.setMinimumWidth(300)
         self.right_panel.setMaximumWidth(900)
-        self.right_panel.setMinimumHeight(800)
+        self.right_panel.setMinimumHeight(600)
 
         # Add Auto-Segmentation to the left panel
         self.left_panel.addTab(AutoSegmentationTab(self.dicom_dir), "Auto-Segment")

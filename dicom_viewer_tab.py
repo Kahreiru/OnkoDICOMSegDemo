@@ -36,7 +36,7 @@ class DicomViewer(QWidget):
         # UI Elements
         # Axial View Elements
         self.canvas_axial = QLabel()
-        self.canvas_axial.setMinimumSize(QSize(256, 256))
+        self.canvas_axial.setMinimumSize(QSize(128, 128))
         # self.ax = self.canvas_axial.figure.add_subplot()
         self.axial_slider = QSlider()
         self.axial_slider.setStyleSheet(self.style_sheet())
@@ -45,7 +45,7 @@ class DicomViewer(QWidget):
         # self.canvas_coronal = FigureCanvas(plt.Figure())
         # self.ax_coronal = self.canvas_coronal.figure.add_subplot()
         self.canvas_coronal = QLabel()
-        self.canvas_coronal.setMinimumSize(QSize(256, 256))
+        self.canvas_coronal.setMinimumSize(QSize(128, 128))
         self.coronal_slider = QSlider()
         self.coronal_slider.setStyleSheet(self.style_sheet())
 
@@ -53,7 +53,7 @@ class DicomViewer(QWidget):
         # self.canvas_sagittal = FigureCanvas(plt.Figure())
         # self.ax_sagittal = self.canvas_sagittal.figure.add_subplot()
         self.canvas_sagittal = QLabel()
-        self.canvas_sagittal.setMinimumSize(QSize(256, 256))
+        self.canvas_sagittal.setMinimumSize(QSize(128, 128))
         self.sagittal_slider = QSlider()
         self.sagittal_slider.setStyleSheet(self.style_sheet())
 
