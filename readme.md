@@ -13,7 +13,7 @@ to the user to be further focused on without the need for the user to manually d
 and isolate the specific body part.
 
 ## Requirements
-- python version 3.12: [link](https://www.python.org/)
+- Python version 3.12: [link](https://www.python.org/)
 - Poetry: [link](https://python-poetry.org/)
 
 ## Dependencies
