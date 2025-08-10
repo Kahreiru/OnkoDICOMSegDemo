@@ -1,7 +1,5 @@
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtGui import QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog
-from skimage.filters import window
 
 from auto_segmentation_controller import AutoSegmentationController
 from StyleSheetReader import StyleSheetReader
