@@ -414,8 +414,6 @@ class DicomViewer(QWidget):
         self.seg_arrays.clear()
         self.seg_names.clear()
         self.seg_colors.clear()
-        self.overlay_checkboxes.clear()
-        self.overlay_visibility.clear()
 
         # Remove previous segment ref from array
         for checkbox in self.overlay_checkboxes:
@@ -423,4 +421,9 @@ class DicomViewer(QWidget):
 
         # Remove previous ref from the layout in UI
         for i in reversed(range(self.checkbox_container.count())):
-            self.checkbox_container.itemAt(i).widget().deleteLater()
+            widget = self.checkbox_container.itemAt(i).widget()
+            if widget is not None:
+                widget.deleteLater()
+
+        self.overlay_checkboxes.clear()
+        self.overlay_visibility.clear()
