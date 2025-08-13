@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "onkodicomsegdemo"
+name = "OnkoDICOMSegDemo"
 version = "0.1.0"
-packages = [{ include = "onkodicomsegdemo", from = "src" }]
+packages = [{ include = "OnkoDICOMSegDemo", from = "src" }]
 description = "Basic demo of TotalSegmentator API"
 authors = [
     "Tim Glasgow",
