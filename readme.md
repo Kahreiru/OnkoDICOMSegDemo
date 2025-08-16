@@ -33,6 +33,7 @@ e.g. cd C:\path\to\your\project
 4. Setup a virtual environment by typing the following into the console:
 - Windows: python -m venv venv
 - MacOS: python3 -m venv venv
+  
 N.B. Windows uses python.exe while Mac uses python3.
 5. Activate the virtual environment by typing the following (depending on OS)
 into the console:
