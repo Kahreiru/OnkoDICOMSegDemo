@@ -3,7 +3,7 @@ import os
 from PySide6.QtCore import QThreadPool, Slot
 
 from auto_segmentation import AutoSegmentation
-# from multithread import Worker
+from multithread import Worker
 import threading
 from dicom_viewer_tab import DicomViewer
 
@@ -81,11 +81,9 @@ class AutoSegmentationController:
         auto_segmentation = AutoSegmentation(self)
 
         # Run the API task on separate thread
-        # worker = Worker(auto_segmentation.run_segmentation_workflow,dicom_dir, task, fast)
-        # self.threadpool.start(worker)
+        worker = Worker(auto_segmentation.run_segmentation_workflow,dicom_dir, task, fast)
+        self.threadpool.start(worker)
 
-        seg_thread = threading.Thread(target=auto_segmentation.run_segmentation_workflow, args=(dicom_dir, task, fast))
-        seg_thread.start()
 
     @Slot()
     def on_segmentation_finished(self) -> None:
