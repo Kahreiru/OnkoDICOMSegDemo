@@ -22,29 +22,58 @@ and isolate the specific body part.
 - pydicom: [link](https://pydicom.github.io/)
 - platipy: [link](https://github.com/pyplati/platipy)
 - acvl-utils: [link](https://github.com/MIC-DKFZ/acvl_utils)
+- rt_utils: [link](https://github.com/qurit/rt-utils)   
+- SimpleITK: [link](https://simpleitk.readthedocs.io/en/master/gettingStarted.html)
 
 ## Installation
-1. Extract the folder from the zip
-2. Open Terminal in folder location
-3. Input `poetry install` into console
-4. Wait for the installation to complete
+1. Ensure you have Python installed on your machine (see Requirements)
+2. Extract the folder from the zip
+3. Open Terminal console and navigate to the folder/project location
+e.g. cd C:\path\to\your\project
+4. Setup a virtual environment by typing the following into the console:
+- Windows: python -m venv venv
+- MacOS: python3 -m venv venv
+  
+N.B. Windows uses python.exe while Mac uses python3.
+5. Activate the virtual environment by typing the following (depending on OS)
+into the console:
+- MacOS: source venv/bin/activate
+- Windows: venv\Scripts\activate
+- Windows (PowerShell): .\venv\Scripts\Activate.ps1
+6. Install poetry in your virtual environment by entering the following into
+console:
+pip install poetry
+7. Install poetry dependencies by typing the following into console:
+poetry install
+8. Wait for the installation to complete
 
 ## Usage
-Included in the Zip file is an anonymised dicom file for the purposes of demonstration
-1. Open Terminal in the folder location
-2. Enter `poetry run main.py` into the console.
-3. wait for the program to open
-4. When the file selection prompt opens select the `Demo` file
+Included in the Zip file is an anonymised Dicom directory (Demo) for the purposes of
+demonstration
+1. Open Terminal console in the folder/project location
+2. To run the application, enter the following into the console:
+- Windows: python main.py
+- MacOS: python3 main.py
+3. Wait for the program to open – this may take a couple of minutes.
+4. When the file selection prompt opens select the “Demo” directory
+
 5. You will then be directed to the prototype user interface
-6. Select the appropriate body part from the drop down menu you would like to segment
+6. Select the appropriate body part from the drop-down menu you would like to
+segment
 7. Select if you want the process to go faster (lower resolution)
-   - Quickest results will be obtained by selecting `Task: 'total'` with the option `Fast` selected
+o Quickest results will be obtained by selecting Task: &#39;total&#39; with the
+option Fast selected
+
 8. Click Start
-9. Wait for processing to complete as this may take several minutes
-10. Once complete, click 'Load Segmentations'
-11. Open the segmentations folder saved in the same directory as the loaded dicom image set
-12. Select Desired Segmentations to display (for this demo, lung segmentations will show)
-13. View segmentations on each axis by dragging the sliders up and down on the image views
-14. To disable the segmentations on the views
-15. Go to the segmentations section of the window (this may need to be dragged up to make it more visible)
-16. Then uncheck the check box corresponding to the appropriate segmentation
+9. Wait for processing to complete, as depending on task selection and your
+computers specifications, the processing may take quite some time
+10. Once complete, click &#39;Load Segmentations&#39;
+11. Open the segmentations folder saved in the Demo directory
+12. Select desired segmentations to display (for this image set it is advised to
+select lung segmentations, as the scans are of the chest area)
+13. View segmentations on each axis by dragging the sliders up and down on the
+image views
+14. To disable a segmentation or multiple segmentations in the view panels,
+uncheck the corresponding checkbox in the segmentations panel
+15. After closing the application, back in the terminal console type “deactivate” at
+the prompt to close the virtual environment.

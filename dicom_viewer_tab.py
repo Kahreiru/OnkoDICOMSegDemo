@@ -45,17 +45,11 @@ class DicomViewer(QWidget):
         self.axial_slider = QSlider()
         self.axial_slider.setStyleSheet(self.style_sheet())
 
-        # Coronal View Elements
-        # self.canvas_coronal = FigureCanvas(plt.Figure())
-        # self.ax_coronal = self.canvas_coronal.figure.add_subplot()
         self.canvas_coronal = QLabel()
         self.canvas_coronal.setMinimumSize(QSize(128, 128))
         self.coronal_slider = QSlider()
         self.coronal_slider.setStyleSheet(self.style_sheet())
 
-        # Sagittal View Elements
-        # self.canvas_sagittal = FigureCanvas(plt.Figure())
-        # self.ax_sagittal = self.canvas_sagittal.figure.add_subplot()
         self.canvas_sagittal = QLabel()
         self.canvas_sagittal.setMinimumSize(QSize(128, 128))
         self.sagittal_slider = QSlider()
@@ -178,14 +172,8 @@ class DicomViewer(QWidget):
         if not files:
             return
 
-        # Clear all previous data
-        self.seg_arrays.clear()
-        self.seg_names.clear()
-        self.seg_colors.clear()
-        self.overlay_visibility.clear()
-
-        for i in reversed(range(self.checkbox_container.count())):
-            self.checkbox_container.itemAt(i).widget().deleteLater()
+        # Clear the previously loaded segmentations
+        self._clear_previous_loaded_segments()
 
         # Iterate over the segmentation files load, add check box, and display
         for file_path in files:
@@ -218,14 +206,8 @@ class DicomViewer(QWidget):
 
         mask_dict = load_rtstruct_masks(rtstruct_path, self.dicom_dir)
 
-        self.seg_arrays.clear()
-        self.seg_names.clear()
-        self.seg_colors.clear()
-        self.overlay_visibility.clear()
-
-        # Clear old checkboxes
-        for i in reversed(range(self.checkbox_container.count())):
-            self.checkbox_container.itemAt(i).widget().deleteLater()
+        # Clear the previously loaded segmentations
+        self._clear_previous_loaded_segments()
 
         # base_colors = plt.colormaps['tab20']
 
@@ -315,7 +297,6 @@ class DicomViewer(QWidget):
         sagittal_q_image = QImage(sagittal_norm.data, sagittal_width, sagittal_height, bytes_per_line,
                                QImage.Format.Format_Grayscale8)
         sagittal_pixmap = QPixmap.fromImage(sagittal_q_image)
-
 
         for i, seg_array in enumerate(self.seg_arrays):
             visible = self.overlay_checkboxes[i].isChecked()
@@ -427,3 +408,22 @@ class DicomViewer(QWidget):
             self.canvas_sagittal.width(), self.canvas_sagittal.height(),
             aspectMode=Qt.AspectRatioMode.IgnoreAspectRatio, mode=Qt.SmoothTransformation
         ))
+
+    def _clear_previous_loaded_segments(self):
+        # Clear all previous data
+        self.seg_arrays.clear()
+        self.seg_names.clear()
+        self.seg_colors.clear()
+
+        # Remove previous segment ref from array
+        for checkbox in self.overlay_checkboxes:
+            checkbox.deleteLater()
+
+        # Remove previous ref from the layout in UI
+        for i in reversed(range(self.checkbox_container.count())):
+            widget = self.checkbox_container.itemAt(i).widget()
+            if widget is not None:
+                widget.deleteLater()
+
+        self.overlay_checkboxes.clear()
+        self.overlay_visibility.clear()
